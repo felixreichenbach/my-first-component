@@ -1,0 +1,19 @@
+{
+    "components": [
+        {
+            "name": "sensor1",
+            "type": "sensor",
+            "model": "viam:sensor:mysensor",
+            "attributes": {
+                "multiplier": 2
+            },
+            "depends_on": []
+        }
+    ],
+    "modules": [
+        {
+            "name": "my-first-component",
+            "executable_path": "/home/viam-python-sdk/examples/simple_module/run.sh"
+        }
+    ]
+}
