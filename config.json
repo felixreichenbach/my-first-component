@@ -12,8 +12,8 @@
     ],
     "modules": [
         {
-            "name": "my-first-component",
-            "executable_path": "/home/viam-python-sdk/examples/simple_module/run.sh"
+            "name": "my-first-sensor",
+            "executable_path": "<-- YOUR PATH TO -->/my-first-component/run.sh"
         }
     ]
 }

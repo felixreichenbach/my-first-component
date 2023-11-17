@@ -2,7 +2,7 @@
 cd `dirname $0`
 
 # Create a virtual environment to run our code
-VENV_NAME="venv"
+VENV_NAME=".venv"
 PYTHON="$VENV_NAME/bin/python"
 ENV_ERROR="This module requires Python >=3.8, pip, and virtualenv to be installed."
 
