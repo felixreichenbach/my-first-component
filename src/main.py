@@ -1,3 +1,7 @@
+"""
+A basic example of how to wrap a sensor into the Viam sensor component in Python
+"""
+
 import asyncio
 from typing import Any, ClassVar, Dict, Mapping, Optional, Sequence
 
@@ -17,16 +21,21 @@ LOGGER = getLogger(__name__)
 
 
 class MySensor(Sensor):
-    # Subclass the Viam Sensor component and implement the required functions
+    """ 
+    Class representing the sensor to be implemented/wrapped. 
+    Subclass the Viam Sensor component and implement the required functions 
+    """
     MODEL: ClassVar[Model] = Model(ModelFamily("viam", "sensor"), "mysensor")
 
     def __init__(self, name: str):
         super().__init__(name)
+        self.multiplier = 1.0
 
     @classmethod
     def new(cls, config: ComponentConfig, dependencies: Mapping[ResourceName, ResourceBase]) -> Self:
         """
-        This constructor instantiates a new "mysensor" component and executes the configuration/validation methods
+        This constructor instantiates a new "mysensor" component and 
+        executes the configuration/validation methods
         """
         sensor = cls(config.name)
         sensor.reconfigure(config, dependencies)
@@ -39,10 +48,10 @@ class MySensor(Sensor):
         """
         if "multiplier" in config.attributes.fields:
             if not config.attributes.fields["multiplier"].HasField("number_value"):
-                raise Exception("Multiplier must be a float.")
+                raise ValueError("Multiplier must be a float.")
             multiplier = config.attributes.fields["multiplier"].number_value
             if multiplier == 0:
-                raise Exception("Multiplier cannot be 0.")
+                raise ValueError("Multiplier cannot be 0.")
         return []
 
     async def get_readings(self, extra: Optional[Dict[str, Any]] = None, **kwargs) -> Mapping[str, Any]:
@@ -53,13 +62,15 @@ class MySensor(Sensor):
 
     async def do_command(self, command: Mapping[str, ValueTypes], *, timeout: Optional[float] = None, **kwargs) -> Mapping[str, ValueTypes]:
         """
-        Optional general purpose method to be used for additional device specific operations e.g. reseting a sensor.
+        Optional general purpose method to be used for additional 
+        device specific operations e.g. reseting a sensor.
         """
         raise NotImplementedError()
 
     def reconfigure(self, config: ComponentConfig, dependencies: Mapping[ResourceName, ResourceBase]):
         """
-        This method is executed whenever a new mysensor instance is created or configuration attributes are changed
+        This method is executed whenever a new mysensor instance is created or 
+        configuration attributes are changed
         """
         if "multiplier" in config.attributes.fields:
             multiplier = config.attributes.fields["multiplier"].number_value
@@ -69,17 +80,19 @@ class MySensor(Sensor):
 
     async def close(self):
         """
-        Optional function to include. This will be called when the resource is removed from the config or the module is shutting down.
+        Optional function to include. This will be called when the resource 
+        is removed from the config or the module is shutting down.
         """
-        LOGGER.info(f"{self.name} is closed.")
+        LOGGER.info("%s is closed.", self.name)
 
 
 async def main():
     """
     This function creates and starts a new module, after adding all desired resource models.
-    Resource creators must be registered to the resource registry before the module adds the resource model.
+    Resource creators must be registered before the module adds the resource model.
     """
-    Registry.register_resource_creator(Sensor.SUBTYPE, MySensor.MODEL, ResourceCreatorRegistration(MySensor.new, MySensor.validate_config))
+    Registry.register_resource_creator(Sensor.SUBTYPE, MySensor.MODEL, ResourceCreatorRegistration(
+        MySensor.new, MySensor.validate_config))
 
     module = Module.from_args()
     module.add_model_from_registry(Sensor.SUBTYPE, MySensor.MODEL)
