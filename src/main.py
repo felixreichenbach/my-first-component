@@ -17,14 +17,16 @@ from viam.resource.registry import Registry, ResourceCreatorRegistration
 from viam.resource.types import Model, ModelFamily
 from viam.utils import ValueTypes
 
+# Activate the logger to send log entries to app.viam.com, visible under the logs tab
 LOGGER = getLogger(__name__)
 
 
 class MySensor(Sensor):
-    """ 
-    Class representing the sensor to be implemented/wrapped. 
-    Subclass the Viam Sensor component and implement the required functions 
     """
+    Class representing the sensor to be implemented/wrapped.
+    Subclass the Viam Sensor component and implement the required functions
+    """
+
     MODEL: ClassVar[Model] = Model(ModelFamily("viam", "sensor"), "mysensor")
 
     def __init__(self, name: str):
@@ -32,9 +34,11 @@ class MySensor(Sensor):
         self.multiplier = 1.0
 
     @classmethod
-    def new(cls, config: ComponentConfig, dependencies: Mapping[ResourceName, ResourceBase]) -> Self:
+    def new(
+        cls, config: ComponentConfig, dependencies: Mapping[ResourceName, ResourceBase]
+    ) -> Self:
         """
-        This constructor instantiates a new "mysensor" component and 
+        This constructor instantiates a new "mysensor" component and
         executes the configuration/validation methods
         """
         sensor = cls(config.name)
@@ -54,22 +58,32 @@ class MySensor(Sensor):
                 raise ValueError("Multiplier cannot be 0.")
         return []
 
-    async def get_readings(self, extra: Optional[Dict[str, Any]] = None, **kwargs) -> Mapping[str, Any]:
+    async def get_readings(
+        self, extra: Optional[Dict[str, Any]] = None, **kwargs
+    ) -> Mapping[str, Any]:
         """
         Required method to be implemented for a sensor component
         """
         return {"signal": 1 * self.multiplier}
 
-    async def do_command(self, command: Mapping[str, ValueTypes], *, timeout: Optional[float] = None, **kwargs) -> Mapping[str, ValueTypes]:
+    async def do_command(
+        self,
+        command: Mapping[str, ValueTypes],
+        *,
+        timeout: Optional[float] = None,
+        **kwargs
+    ) -> Mapping[str, ValueTypes]:
         """
-        Optional general purpose method to be used for additional 
+        Optional general purpose method to be used for additional
         device specific operations e.g. reseting a sensor.
         """
         raise NotImplementedError()
 
-    def reconfigure(self, config: ComponentConfig, dependencies: Mapping[ResourceName, ResourceBase]):
+    def reconfigure(
+        self, config: ComponentConfig, dependencies: Mapping[ResourceName, ResourceBase]
+    ):
         """
-        This method is executed whenever a new mysensor instance is created or 
+        This method is executed whenever a new mysensor instance is created or
         configuration attributes are changed
         """
         if "multiplier" in config.attributes.fields:
@@ -80,7 +94,7 @@ class MySensor(Sensor):
 
     async def close(self):
         """
-        Optional function to include. This will be called when the resource 
+        Optional function to include. This will be called when the resource
         is removed from the config or the module is shutting down.
         """
         LOGGER.info("%s is closed.", self.name)
@@ -91,8 +105,11 @@ async def main():
     This function creates and starts a new module, after adding all desired resource models.
     Resource creators must be registered before the module adds the resource model.
     """
-    Registry.register_resource_creator(Sensor.SUBTYPE, MySensor.MODEL, ResourceCreatorRegistration(
-        MySensor.new, MySensor.validate_config))
+    Registry.register_resource_creator(
+        Sensor.SUBTYPE,
+        MySensor.MODEL,
+        ResourceCreatorRegistration(MySensor.new, MySensor.validate_config),
+    )
 
     module = Module.from_args()
     module.add_model_from_registry(Sensor.SUBTYPE, MySensor.MODEL)

@@ -1,4 +1,7 @@
 #!/bin/sh
+
+#Sample shell scrip to launch the Python module. This may vary depending on your environment and needs
+
 cd `dirname $0`
 
 # Create a virtual environment to run our code
