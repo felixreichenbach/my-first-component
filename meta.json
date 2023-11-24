@@ -1,0 +1,13 @@
+{
+  "module_id": "felix-home-registry:my-first-component",
+  "visibility": "private",
+  "url": "https://github.com/felixreichenbach/my-first-component",
+  "description": "A workshop test",
+  "models": [
+    {
+      "api": "rdk:component:sensor",
+      "model": "felix-home-registry:sensor:mysensor2"
+    }
+  ],
+  "entrypoint": "run.sh"
+}
